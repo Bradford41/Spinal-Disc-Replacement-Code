@@ -60,7 +60,7 @@ def read_directory(model):
     #----- Loading Facet Labels -----
     df_all = pd.read_excel(next(data_path.glob('*.xlsx')), sheet_name="Sheet1", header=None) #pulls just first file in folder
     #Get facet labels
-    facet_labels = df_all.iloc[3].dropna().tolist()  # row 4 (index=3 in zero-based)
+    facet_labels = df_all.iloc[8].dropna().tolist()  # row 4 (index=3 in zero-based)
     print("Facet Labels Found:", facet_labels)
     #Pairing labels together 
     facet_pairs = group_facets(facet_labels)
@@ -70,7 +70,7 @@ def read_directory(model):
 
         #Reading all data for 4 motion
         if entry.name.startswith("4NP"):
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=4, nrows = 20) #skip first four rows
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=9, nrows = 20) #skip first four rows
             data_4n = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -81,7 +81,7 @@ def read_directory(model):
                         "FCMS": cols.iloc[:, 4].to_numpy()
                     }
 
-            df_data = pd.read_excel(entry, sheet_name= "Sheet1", skiprows = 33)
+            df_data = pd.read_excel(entry, sheet_name= "Sheet1", skiprows = 37)
             data_4p = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -96,7 +96,7 @@ def read_directory(model):
         #Reading all data for 5 motion
         elif entry.name.startswith("5NP"):
             #------ Loading Data ------
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=4, nrows = 20) #skip first four rows
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=9, nrows = 20) #skip first four rows
             # Build dictionary
             data_5n = {}
             for i, label in enumerate(facet_labels):
@@ -108,7 +108,7 @@ def read_directory(model):
                         "FCMS": cols.iloc[:, 4].to_numpy()
                     }
 
-            df_data = pd.read_excel(entry, sheet_name= "Sheet1", skiprows = 33)
+            df_data = pd.read_excel(entry, sheet_name= "Sheet1", skiprows = 37)
             data_5p = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -122,7 +122,7 @@ def read_directory(model):
 
         #Reading all data for 6 motion (axial rotation)
         elif entry.name.startswith("6NP"):
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=4, nrows = 20) #skip first four rows
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=9, nrows = 20) #skip first four rows
             data_6n = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -132,7 +132,7 @@ def read_directory(model):
                         "moment": cols.iloc[:, 1].to_numpy(),
                         "FCMS": cols.iloc[:, 4].to_numpy()
                     }
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=33)
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=37)
             data_6p = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -170,7 +170,7 @@ def read_directory2(model):
 
         #Reading all data for 4 motion
         if entry.name.startswith("4NP"):
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=8, nrows = 20) #skip first eight rows, take 20 rows
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=9, nrows = 20) #skip first eight rows, take 20 rows
             data_4n = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -196,7 +196,7 @@ def read_directory2(model):
         #Reading all data for 5 motion
         elif entry.name.startswith("5NP"):
             #------ Loading Data ------
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=8, nrows = 20) #skip first eight rows
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=9, nrows = 20) #skip first eight rows
             # Build dictionary
             data_5n = {}
             for i, label in enumerate(facet_labels):
@@ -222,7 +222,7 @@ def read_directory2(model):
 
         #Reading all data for 6 motion (axial rotation)
         elif entry.name.startswith("6NP"):
-            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=8, nrows = 20) #skip first eight rows
+            df_data = pd.read_excel(entry, sheet_name="Sheet1", skiprows=9, nrows = 20) #skip first eight rows
             data_6n = {}
             for i, label in enumerate(facet_labels):
                 cols = df_data.iloc[:, i*5:(i+1)*5]
@@ -647,5 +647,121 @@ def plotfacet_PDR(model1, model2, motion):
 
 #For PDR Presentation
 
-plotfacet_PDR('Intact', 'LatSlideNoTether', '4N-4P')
-plotfacet_PDR('Intact', 'LatSlideNoTether', '5N-5P')
+#plotfacet_PDR('Intact', 'LatSlideNoTether', '4N-4P')
+#plotfacet_PDR('Intact', 'LatSlideNoTether', '5N-5P')
+
+def RMSE(model1, model2, motion):
+    #Read in data for desired two models to be compared
+    data4p_1, data4n_1, data5p_1, data5n_1, data6p_1, data6n_1, facet_pairs = read_directory(model1)
+    data4p_2, data4n_2, data5p_2, data5n_2, data6p_2, data6n_2, facet_pairs2 = read_directory2(model2)
+
+    #Specify desired motion, decides what will be plotted
+    if (motion == '4N-4P'):
+        data_n_1 = data4n_1
+        data_p_1 = data4p_1
+
+        data_n_2 = data4n_2
+        data_p_2 = data4p_2
+    elif (motion == '5N-5P'):
+        data_n_1 = data5n_1
+        data_p_1 = data5p_1
+        
+        data_n_2 = data5n_2
+        data_p_2 = data5p_2
+    elif (motion == '6N-6P'):
+        data_n_1 = data6n_1
+        data_p_1 = data6p_1
+
+        data_n_2 = data6n_2
+        data_p_2 = data6p_2
+
+    #Hardcoded values for moment, still couldn't figure out why it's not reading right
+    moment = [-1.92, -1.81, -1.71, -1.61, -1.52, -1.41, -1.32, -1.22, -1.13, 
+              -1.02, -0.96, -0.80, -0.72, -0.64, -0.54, -0.43, -0.33, -0.21, -0.12, 
+               0, 0.12, 0.21, 0.33, 0.43, 0.54, 0.64, 0.72, 0.80, 0.96, 
+               1.02, 1.13, 1.22, 1.32, 1.41, 1.52, 1.61, 1.71, 1.81, 1.92]
+
+    #Iterate through all facet pairs
+    for left, right in facet_pairs:
+        if left.startswith('3'): #if C34 disc values, plot data on left and right plot
+            leftyn1 = data_n_1[left]["FCMS"]
+            leftyp1 = data_p_1[left]["FCMS"]
+            rightyn1 = data_n_1[right]["FCMS"]
+            rightyp1 = data_p_1[right]["FCMS"]
+
+            leftyn2 = data_n_2[left]["FCMS"]
+            leftyp2 = data_p_2[left]["FCMS"]
+            rightyn2 = data_n_2[right]["FCMS"]
+            rightyp2 = data_p_2[right]["FCMS"]
+
+        elif left.startswith('4'): #If C45 disc values, plot data on left and right plot
+            leftyn3 = data_n_1[left]["FCMS"]
+            leftyp3 = data_p_1[left]["FCMS"]
+            rightyn3 = data_n_1[right]["FCMS"]
+            rightyp3 = data_p_1[right]["FCMS"]
+
+            leftyn4 = data_n_2[left]["FCMS"]
+            leftyp4 = data_p_2[left]["FCMS"]
+            rightyn4 = data_n_2[right]["FCMS"]
+            rightyp4 = data_p_2[right]["FCMS"]
+
+            
+        elif left.startswith('5'): #If C56 disc values, plot data on left and right plot
+            leftyn5 = data_n_1[left]["FCMS"]
+            leftyp5 = data_p_1[left]["FCMS"]
+            rightyn5 = data_n_1[right]["FCMS"]
+            rightyp5 = data_p_1[right]["FCMS"]
+
+            leftyn6 = data_n_2[left]["FCMS"]
+            leftyp6 = data_p_2[left]["FCMS"]
+            rightyn6 = data_n_2[right]["FCMS"]
+            rightyp6 = data_p_2[right]["FCMS"]
+            
+    lefty1 = np.concatenate((np.flip(leftyn1[0:20]), leftyp1[1:20]))
+    righty1 = np.concatenate((np.flip(rightyn1[0:20]), rightyp1[1:20]))
+
+    lefty2 = np.concatenate((np.flip(leftyn2[0:20]), leftyp2[1:20]))
+    righty2 = np.concatenate((np.flip(rightyn2[0:20]), rightyp2[1:20]))
+        
+    lefty3 = np.concatenate((np.flip(leftyn3[0:20]), leftyp3[1:20]))
+    righty3 = np.concatenate((np.flip(rightyn3[0:20]), rightyp3[1:20]))
+
+    lefty4 = np.concatenate((np.flip(leftyn4[0:20]), leftyp4[1:20]))
+    righty4 = np.concatenate((np.flip(rightyn4[0:20]), rightyp4[1:20]))
+
+    lefty5 = np.concatenate((np.flip(leftyn5[0:20]), leftyp5[1:20]))
+    righty5 = np.concatenate((np.flip(rightyn5[0:20]), rightyp5[1:20]))
+
+    lefty6 = np.concatenate((np.flip(leftyn6[0:20]), leftyp6[1:20]))
+    righty6 = np.concatenate((np.flip(rightyn6[0:20]), rightyp6[1:20]))
+
+    difference1_left = np.zeros(len(lefty1))
+    difference2_left = np.zeros(len(lefty1))
+    difference3_left = np.zeros(len(lefty1))
+
+    difference1_right = np.zeros(len(lefty1))
+    difference2_right = np.zeros(len(lefty1))
+    difference3_right = np.zeros(len(lefty1))
+
+    for i in range(len(lefty1)):
+        difference1_left[i] = lefty1[i] - lefty2[i]
+        difference2_left[i] = lefty3[i] - lefty4[i]
+        difference3_left[i] = lefty5[i] - lefty6[i]
+
+        difference1_right[i] = righty1[i] - righty2[i]
+        difference2_right[i] = righty3[i] - righty4[i]
+        difference3_right[i] = righty5[i] - righty6[i]
+            
+    RMSE_C34_left = np.sqrt((1/len(lefty1))*np.sum(difference1_left)**2)
+    RMSE_C34_right = np.sqrt((1/len(righty1))*np.sum(difference1_right)**2)
+
+    RMSE_C45_left = np.sqrt((1/len(lefty1))*np.sum(difference2_left)**2)
+    RMSE_C45_right = np.sqrt((1/len(righty1))*np.sum(difference2_right)**2)
+
+    RMSE_C56_left = np.sqrt((1/len(lefty1))*np.sum(difference3_left)**2)
+    RMSE_C56_right = np.sqrt((1/len(righty1))*np.sum(difference3_right)**2)
+
+    return RMSE_C34_left, RMSE_C34_right, RMSE_C45_left, RMSE_C45_right, RMSE_C56_left, RMSE_C56_right
+
+C34_left, C45_left, C56_left, C34_right, C45_right,  C56_right = RMSE('Intact', 'APPhysTether', '4N-4P')
+print(C34_left, C45_left, C56_left, C34_right, C45_right, C56_right)
